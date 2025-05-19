@@ -1,21 +1,17 @@
 import os
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from PIL import Image
 import io
 import numpy as np
-import logging
+from config import Config
+from logger import logger
 
 from image_processor import ImageProcessor
 from feature_extractor import FeatureExtractor
 from vector_store import VectorStore
-
-# Cấu hình logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Flower Search System")
 
@@ -34,59 +30,14 @@ feature_extractor = FeatureExtractor()
 vector_store = VectorStore()
 
 # Create static directory for uploaded images
-os.makedirs("static/uploads", exist_ok=True)
+os.makedirs(Config.UPLOAD_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-@app.get("/", response_class=HTMLResponse)
-async def get_home():
-    return """
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>Flower Search System</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
-                }
-                .upload-form {
-                    border: 2px dashed #ccc;
-                    padding: 20px;
-                    text-align: center;
-                    margin: 20px 0;
-                }
-                .results {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 20px;
-                    margin-top: 20px;
-                }
-                .result-image {
-                    width: 100%;
-                    height: auto;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>Flower Search System</h1>
-            <div class="upload-form">
-                <form action="/search" method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" accept="image/*" required>
-                    <button type="submit">Search Similar Flowers</button>
-                </form>
-            </div>
-            <div id="results" class="results"></div>
-        </body>
-    </html>
-    """
 
 @app.post("/search")
 async def search_similar_images(file: UploadFile = File(...)):
     try:
         # Save uploaded file
-        file_location = f"static/uploads/{file.filename}"
+        file_location = os.path.join(Config.UPLOAD_DIR, file.filename)
         with open(file_location, "wb+") as file_object:
             file_object.write(await file.read())
         
@@ -128,4 +79,4 @@ async def search_similar_images(file: UploadFile = File(...)):
         }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host=Config.HOST, port=Config.PORT) 

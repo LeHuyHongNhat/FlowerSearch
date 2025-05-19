@@ -1,144 +1,152 @@
-# Flower Search System
+# Flower Search System 🌸
 
-A content-based image retrieval system for flowers using deep learning and vector similarity search.
+Hệ thống tìm kiếm ảnh hoa tương tự sử dụng deep learning và vector similarity search.
 
-## Features
+## Tính Năng Chính
 
-- Image preprocessing to standardize image sizes (640x640)
-- Feature extraction using pre-trained ResNet50 CNN
-- Vector similarity search using ChromaDB
-- Web interface for image upload and search
-- System evaluation metrics (precision, recall, mAP)
+- Tiền xử lý ảnh chuẩn hóa kích thước (640x640)
+- Trích xuất đặc trưng sử dụng ResNet50 CNN đã được huấn luyện trước
+- Tìm kiếm vector tương tự sử dụng ChromaDB
+- Giao diện web cho việc upload và tìm kiếm ảnh
+- Đánh giá hệ thống (precision, recall, mAP)
 
-## Installation
+## Yêu Cầu Hệ Thống
 
-1. Clone the repository:
+- Python 3.8+
+- PyTorch 2.2.1
+- FastAPI 0.110.0
+- ChromaDB 0.4.22
+- Streamlit 1.32.0
+- Các thư viện khác trong requirements.txt
+
+## Cài Đặt
+
+1. Clone repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/yourusername/FlowerSearch.git
 cd FlowerSearch
 ```
 
-2. Install dependencies:
+2. Tạo môi trường ảo và cài đặt dependencies:
 
 ```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-## Running the System
+## Chạy Hệ Thống
 
-### Step 1: Prepare the Dataset
+### Bước 1: Chuẩn Bị Dataset
 
-Place your flower images in the `Dataset` directory. Each subdirectory should contain images of the same flower type (less than 20 images per directory).
+Đặt ảnh hoa vào thư mục `Dataset`. Mỗi thư mục con nên chứa ảnh của cùng một loại hoa (ít hơn 20 ảnh mỗi thư mục).
 
-### Step 2: Initialize the Database
-
-Before running the system, you need to initialize the database with your flower images:
+### Bước 2: Khởi Tạo Database
 
 ```bash
 python init_db.py
 ```
 
-This script will:
+Script này sẽ:
 
-- Process all images in the Dataset directory
-- Extract features using ResNet50
-- Store the features in ChromaDB
-- Show progress and any errors during processing
+- Xử lý tất cả ảnh trong thư mục Dataset
+- Trích xuất đặc trưng sử dụng ResNet50
+- Lưu trữ đặc trưng trong ChromaDB
+- Hiển thị tiến trình và lỗi (nếu có)
 
-### Step 3: Start the Backend Server
-
-Open a terminal and run:
+### Bước 3: Chạy Backend Server
 
 ```bash
 python app.py
 ```
 
-The FastAPI server will start at http://localhost:8000
+FastAPI server sẽ chạy tại http://localhost:8000
 
-### Step 4: Start the Frontend Interface
-
-Open another terminal and run:
+### Bước 4: Chạy Frontend Interface
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-The Streamlit interface will be available at http://localhost:8501
+Giao diện Streamlit sẽ có sẵn tại http://localhost:8501
 
-### Step 5: Using the System
+## Cấu Trúc Dự Án
 
-1. Open your web browser and go to http://localhost:8501
-2. Upload a flower image using the interface
-3. Click the "Tìm kiếm" (Search) button
-4. View the top 3 most similar images with their similarity scores
+```
+FlowerSearch/
+├── Dataset/              # Chứa ảnh hoa
+├── chroma_db/           # Vector database
+├── static/
+│   └── uploads/        # Thư mục lưu ảnh upload
+├── app.py              # FastAPI backend
+├── streamlit_app.py    # Frontend interface
+├── image_processor.py  # Xử lý ảnh
+├── feature_extractor.py # Trích xuất đặc trưng
+├── vector_store.py     # Quản lý vector database
+├── evaluation.py       # Đánh giá hệ thống
+├── init_db.py         # Khởi tạo database
+├── config.py          # Cấu hình hệ thống
+├── logger.py          # Cấu hình logging
+├── requirements.txt   # Dependencies
+└── README.md         # Tài liệu hướng dẫn
+```
 
-## System Components
+## Sử Dụng
 
-- `image_processor.py`: Handles image preprocessing and standardization
-- `feature_extractor.py`: Extracts features using pre-trained CNN
-- `vector_store.py`: Manages vector storage and similarity search
-- `app.py`: FastAPI backend server
-- `streamlit_app.py`: Streamlit frontend interface
-- `evaluation.py`: System evaluation metrics
-- `init_db.py`: Database initialization script
+1. Mở trình duyệt và truy cập http://localhost:8501
+2. Upload ảnh hoa qua giao diện
+3. Nhấn nút "Tìm kiếm"
+4. Xem 3 ảnh tương tự nhất với điểm tương đồng
 
-## Evaluation
-
-To evaluate the system performance:
+## Đánh Giá Hệ Thống
 
 ```python
 from evaluation import SystemEvaluator, create_test_queries
 from vector_store import VectorStore
 
-# Initialize components
+# Khởi tạo components
 vector_store = VectorStore()
 evaluator = SystemEvaluator(vector_store)
 
-# Create test queries
+# Tạo test queries
 test_queries = create_test_queries("path/to/dataset", vector_store)
 
-# Evaluate system
+# Đánh giá hệ thống
 metrics = evaluator.evaluate_system(test_queries)
 print(metrics)
 ```
 
-## Troubleshooting
+## Xử Lý Sự Cố
 
-1. If you get a connection error:
+1. Lỗi kết nối:
 
-   - Make sure the FastAPI backend is running (Step 3)
-   - Check if the backend is accessible at http://localhost:8000
+   - Kiểm tra FastAPI backend đang chạy
+   - Xác nhận backend có thể truy cập tại http://localhost:8000
 
-2. If images are not displaying:
+2. Ảnh không hiển thị:
 
-   - Check if the image paths are correct
-   - Ensure the images are in supported formats (jpg, jpeg, png)
-   - Make sure you've initialized the database (Step 2)
+   - Kiểm tra đường dẫn ảnh
+   - Đảm bảo ảnh đúng định dạng (jpg, jpeg, png)
+   - Xác nhận đã khởi tạo database
 
-3. If no similar images are found:
+3. Không tìm thấy ảnh tương tự:
 
-   - Check if the database was properly initialized
-   - Verify that your Dataset directory contains images
-   - Check the logs for any errors during database initialization
+   - Kiểm tra database đã được khởi tạo đúng
+   - Xác nhận thư mục Dataset có ảnh
+   - Kiểm tra logs để tìm lỗi
 
-4. If the system is slow:
-   - Consider using GPU if available
-   - Reduce the number of images in the dataset
-   - Optimize the vector search parameters
+4. Hệ thống chạy chậm:
+   - Sử dụng GPU nếu có
+   - Giảm số lượng ảnh trong dataset
+   - Tối ưu tham số tìm kiếm vector
 
-## Requirements
+## Giấy Phép
 
-- Python 3.8+
-- PyTorch
-- FastAPI
-- ChromaDB
-- Pillow
-- scikit-learn
-- numpy
-- Streamlit
-- requests
+Xem file [LICENSE.md](LICENSE.md) để biết thêm chi tiết.
 
-## License
+## Liên Hệ
 
-MIT License
+Le Huy Hong Nhat
+Email: nhat050403@gmail.com

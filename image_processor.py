@@ -3,9 +3,11 @@ from PIL import Image
 import torch
 from torchvision import transforms
 from tqdm import tqdm
+from config import Config
+from logger import logger
 
 class ImageProcessor:
-    def __init__(self, target_size=(640, 640)):
+    def __init__(self, target_size=Config.IMAGE_SIZE):
         self.target_size = target_size
         self.transform = transforms.Compose([
             transforms.Resize(target_size),
@@ -20,7 +22,7 @@ class ImageProcessor:
             image = Image.open(image_path).convert('RGB')
             return self.transform(image)
         except Exception as e:
-            print(f"Error processing image {image_path}: {str(e)}")
+            logger.error(f"Error processing image {image_path}: {str(e)}")
             return None
 
     def process_directory(self, directory_path):

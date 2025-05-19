@@ -2,17 +2,14 @@ import chromadb
 import numpy as np
 import os
 from typing import List, Dict, Tuple
-import logging
-
-# Cấu hình logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from config import Config
+from logger import logger
 
 class VectorStore:
-    def __init__(self, persist_directory: str = "chroma_db"):
+    def __init__(self, persist_directory: str = Config.VECTOR_STORE_PATH):
         self.client = chromadb.PersistentClient(path=persist_directory)
         self.collection = self.client.get_or_create_collection(
-            name="flower_images",
+            name=Config.COLLECTION_NAME,
             metadata={"hnsw:space": "cosine"}
         )
 
@@ -57,7 +54,7 @@ class VectorStore:
             logger.error(f"Lỗi khi thêm images vào vector store: {str(e)}")
             raise
 
-    def search_similar_images(self, query_features: np.ndarray, n_results: int = 3) -> List[Dict]:
+    def search_similar_images(self, query_features: np.ndarray, n_results: int = Config.NUM_RESULTS) -> List[Dict]:
         """Search for similar images based on feature vector."""
         try:
             # Convert query features to list

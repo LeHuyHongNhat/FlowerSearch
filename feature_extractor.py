@@ -3,14 +3,11 @@ import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
 import numpy as np
-import logging
-
-# Cấu hình logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from config import Config
+from logger import logger
 
 class FeatureExtractor:
-    def __init__(self, model_name='resnet50'):
+    def __init__(self, model_name=Config.MODEL_NAME):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = self._load_model(model_name)
         self.model = self.model.to(self.device)
